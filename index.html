@@ -165,9 +165,10 @@
 		mounted: function () {
 			//段子
 			fetch('https://api.apiopen.top/getJoke')
-				.then(function (response) {
+				.then(function (response,a) {
 					//return response.json()
 					console.log(response);
+					console.log(a);
 
 				}).then(function (json) {
 					console.log('parsed json', json)
