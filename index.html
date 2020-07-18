@@ -1,189 +1,205 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8" />
-		<title>我的提醒</title>
-		<script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
-		<style>
-			.flex {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
 
-			*,
-			*::before,
-			*::after {
-				box-sizing: border-box;
-			}
+<head>
+	<meta charset="utf-8" />
+	<title>我的提醒</title>
+	<script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+	<style>
+		.flex {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
 
-			body {
-				margin: 0;
-			}
+		*,
+		*::before,
+		*::after {
+			box-sizing: border-box;
+		}
 
-			#app {
-				width: 100%;
-				height: 100vh;
-				background-color: #e3f9fd;
-				padding: 10px;
-			}
+		body {
+			margin: 0;
+		}
 
-			.item {
-				width: 500px;
-				height: 50px;
-				margin-top: 5px;
-				background-color: aquamarine;
-				border-radius: 5px;
-			}
+		#app {
+			width: 100%;
+			height: 100vh;
+			background-color: #e3f9fd;
+			padding: 10px;
+		}
 
-			.time {
-				width: 20%;
-				height: 100%;
-			}
+		.item {
+			width: 500px;
+			height: 50px;
+			margin-top: 5px;
+			background-color: aquamarine;
+			border-radius: 5px;
+		}
 
-			.content {
-				width: 70%;
-				height: 50px;
-				line-height: 50px;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
+		.time {
+			width: 20%;
+			height: 100%;
+		}
 
-			.delete {
-				width: 10%;
-				height: 100%;
-			}
-		</style>
-	</head>
-	<body>
-		<div id='app'>
-			<div class="item flex" v-for="(item,index) in noticeList">
-				<div class="time flex">
-					{{item.timeStr}}
-				</div>
-				<div class="content">
-					{{item.des}}
-				</div>
-				<div class="delete flex" @click="del(index)">
-					✖
-				</div>
+		.content {
+			width: 70%;
+			height: 50px;
+			line-height: 50px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.delete {
+			width: 10%;
+			height: 100%;
+		}
+	</style>
+</head>
+
+<body>
+	<div id='app'>
+		<div class="item flex" v-for="(item,index) in noticeList">
+			<div class="time flex">
+				{{item.timeStr}}
 			</div>
-			<div style="width: 100%;padding: 10px;">
-				<div>
-					<input @keydown.enter="save" placeholder="10:30#提醒内容" style="width: 500px;" v-model="newNotice" />
-				</div>
-				<div style="padding: 10px;">
-					<button @click="save">保存</button>
-				</div>
+			<div class="content">
+				{{item.des}}
+			</div>
+			<div class="delete flex" @click="del(index)">
+				✖
 			</div>
 		</div>
-	</body>
-	<script>
-		function getNumberStr(_num) {
-			if (_num < 10) {
-				return '0' + _num
-			} else {
-				return _num
-			}
+		<div style="width: 100%;padding: 10px;">
+			<div>
+				<input @keydown.enter="save" placeholder="10:30#提醒内容" style="width: 500px;" v-model="newNotice" />
+			</div>
+			<div style="padding: 10px;">
+				<button @click="save">保存</button>
+			</div>
+		</div>
+	</div>
+</body>
+<script>
+	function getNumberStr(_num) {
+		if (_num < 10) {
+			return '0' + _num
+		} else {
+			return _num
 		}
+	}
 
-		function createNotification(notice) {
-			new Notification(notice.timeStr, {
-				body: notice.des,
-				// icon: '/images/alarm.png',
-				// requireInteraction: true
-			});
-		}
+	function createNotification(notice) {
+		new Notification(notice.timeStr, {
+			body: notice.des,
+			// icon: '/images/alarm.png',
+			// requireInteraction: true
+		});
+	}
 
-		let myApp = new Vue({
-			el: '#app',
-			data: {
-				newNotice: '',
-				noticeList: []
-			},
-			methods: {
-				save: function() {
-					if (!this.newNotice) {
+	let myApp = new Vue({
+		el: '#app',
+		data: {
+			newNotice: '',
+			noticeList: []
+		},
+		methods: {
+			save: function () {
+				if (!this.newNotice) {
+					return
+				}
+
+				let arr = this.newNotice.split('#')
+				if (arr.length == 2) {
+					let timeArr;
+					if (this.newNotice.indexOf(':') != -1) {
+						timeArr = arr[0].split(':')
+					} else if (this.newNotice.indexOf('：') != -1) {
+						timeArr = arr[0].split('：')
+					} else {
 						return
 					}
 
-					let arr = this.newNotice.split('#')
-					if (arr.length == 2) {
-						let timeArr;
-						if (this.newNotice.indexOf(':') != -1) {
-							timeArr = arr[0].split(':')
-						} else if (this.newNotice.indexOf('：') != -1) {
-							timeArr = arr[0].split('：')
+					let _hour = parseInt(timeArr[0])
+					let _minute = parseInt(timeArr[1])
+					let _timeStr = getNumberStr(_hour) + ':' + getNumberStr(_minute)
+					let notice = {
+						timeStr: _timeStr,
+						hour: _hour,
+						minute: _minute,
+						des: arr[1]
+					}
+
+					this.noticeList.push(notice)
+					let _list = this.noticeList.sort((_item1, _item2) => {
+						let _hourDiff = _item1.hour - _item2.hour
+						if (_hourDiff != 0) {
+							return _hourDiff
 						} else {
-							return
+							return _item1.minute - _item2.minute
 						}
+					})
+					this.noticeList = _list
 
-						let _hour = parseInt(timeArr[0])
-						let _minute = parseInt(timeArr[1])
-						let _timeStr = getNumberStr(_hour) + ':' + getNumberStr(_minute)
-						let notice = {
-							timeStr: _timeStr,
-							hour: _hour,
-							minute: _minute,
-							des: arr[1]
-						}
-
-						this.noticeList.push(notice)
-						let _list = this.noticeList.sort((_item1, _item2) => {
-							let _hourDiff = _item1.hour - _item2.hour
-							if (_hourDiff != 0) {
-								return _hourDiff
-							} else {
-								return _item1.minute - _item2.minute
-							}
-						})
-						this.noticeList = _list
-
-						localStorage['noticeData'] = JSON.stringify(this.noticeList)
-					}
-				},
-				del: function(index) {
-					this.noticeList.splice(index, 1)
 					localStorage['noticeData'] = JSON.stringify(this.noticeList)
-				},
-				sendNotice: function() {
-					let _date = new Date()
-
-					for (let i = 0; i < this.noticeList.length; i++) {
-						let _notice = this.noticeList[i];
-
-						if (_notice.hour === _date.getHours() &&
-							_notice.minute === _date.getMinutes()) {
-							createNotification(_notice)
-						}
-					}
-				},
+				}
 			},
-			mounted: function() {
-				// 判断浏览器是否支持Notification
-				if (!('Notification' in window)) {
-					alert('你的浏览器不支持通知功能');
-				} else {
-					if (Notification.permission != 'granted') {
+			del: function (index) {
+				this.noticeList.splice(index, 1)
+				localStorage['noticeData'] = JSON.stringify(this.noticeList)
+			},
+			sendNotice: function () {
+				let _date = new Date()
 
-						Notification.requestPermission(function(permission) {
-							if (permission === 'granted') {
-								alert('桌面通知已开启');
-							} else {
-								alert('您拒绝了浏览器的桌面通知功能，无法使用通知功能');
-							}
-						})
+				for (let i = 0; i < this.noticeList.length; i++) {
+					let _notice = this.noticeList[i];
+
+					if (_notice.hour === _date.getHours() &&
+						_notice.minute === _date.getMinutes()) {
+						createNotification(_notice)
 					}
 				}
+			},
+		},
+		mounted: function () {
+			//段子
+			fetch('https://api.apiopen.top/getJoke')
+				.then(function (response) {
+					//return response.json()
+					console.log(response);
 
-				let noticeData = localStorage['noticeData'];
-				if (noticeData) {
-					this.noticeList = JSON.parse(noticeData)
+				}).then(function (json) {
+					console.log('parsed json', json)
+				}).catch(function (ex) {
+					console.log('parsing failed', ex)
+				})
+
+
+			// 判断浏览器是否支持Notification
+			if (!('Notification' in window)) {
+				alert('你的浏览器不支持通知功能');
+			} else {
+				if (Notification.permission != 'granted') {
+
+					Notification.requestPermission(function (permission) {
+						if (permission === 'granted') {
+							alert('桌面通知已开启');
+						} else {
+							alert('您拒绝了浏览器的桌面通知功能，无法使用通知功能');
+						}
+					})
 				}
-
-				setInterval(this.sendNotice, 60000)
 			}
-		})
-	</script>
+
+			let noticeData = localStorage['noticeData'];
+			if (noticeData) {
+				this.noticeList = JSON.parse(noticeData)
+			}
+
+			setInterval(this.sendNotice, 60000)
+		}
+	})
+</script>
+
 </html>
