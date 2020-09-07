@@ -43,7 +43,7 @@
 		}
 
 		.content {
-			width: 70%;
+			width: 60%;
 			height: 50px;
 			line-height: 50px;
 			overflow: hidden;
@@ -164,17 +164,17 @@
 		},
 		mounted: function () {
 			//段子
-			fetch('https://api.apiopen.top/getJoke')
-				.then(function (response,a) {
-					//return response.json()
-					console.log(response);
-					console.log(a);
+			// fetch('https://api.apiopen.top/getJoke')
+			// 	.then(function (response,a) {
+			// 		//return response.json()
+			// 		console.log(response);
+			// 		console.log(a);
 
-				}).then(function (json) {
-					console.log('parsed json', json)
-				}).catch(function (ex) {
-					console.log('parsing failed', ex)
-				})
+			// 	}).then(function (json) {
+			// 		console.log('parsed json', json)
+			// 	}).catch(function (ex) {
+			// 		console.log('parsing failed', ex)
+			// 	})
 
 
 			// 判断浏览器是否支持Notification
